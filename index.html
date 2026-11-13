@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f3ed">
+  <title>Tic-Tac-Toe</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #20302b;
+      --muted: #64736c;
+      --paper: #f4f3ed;
+      --board: #fffefa;
+      --line: #d9ded5;
+      --green: #27765e;
+      --green-light: #dcece3;
+      --coral: #d45e4c;
+      --yellow: #f2c45c;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      padding: 28px 18px;
+      color: var(--ink);
+      background-color: var(--paper);
+      background-image: radial-gradient(#d9ded5 0.8px, transparent 0.8px);
+      background-size: 19px 19px;
+      font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+    }
+
+    main {
+      width: min(100%, 430px);
+      padding: clamp(24px, 7vw, 42px);
+      border: 1px solid #e2e4dc;
+      border-radius: 8px;
+      background: var(--board);
+      box-shadow: 0 16px 45px #26352c12;
+      animation: arrive 420ms ease-out both;
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--green);
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(2.2rem, 11vw, 3.2rem);
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .intro {
+      margin: 12px 0 28px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .scoreboard {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      margin-bottom: 13px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .player { display: flex; align-items: center; gap: 8px; }
+    .player:last-child { justify-content: flex-end; }
+    .player strong { color: var(--ink); font-size: 1rem; }
+    .mark { font-size: 1.15rem; font-weight: 900; }
+    .mark.x { color: var(--green); }
+    .mark.o { color: var(--coral); }
+    .score-divider { color: #a4ada5; }
+
+    .status {
+      min-height: 26px;
+      margin: 0 0 15px;
+      color: var(--ink);
+      font-size: 0.98rem;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 9px;
+      aspect-ratio: 1;
+    }
+
+    .cell {
+      display: grid;
+      place-items: center;
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fbfbf7;
+      color: var(--ink);
+      font: 800 clamp(2.8rem, 17vw, 4.5rem)/1 "Trebuchet MS", sans-serif;
+      cursor: pointer;
+      transition: background-color 140ms ease, border-color 140ms ease, transform 140ms ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .cell:hover:enabled { transform: translateY(-2px); border-color: #9eb8a9; background: #f3f8f2; }
+    .cell:focus-visible, .reset:focus-visible { outline: 3px solid var(--yellow); outline-offset: 3px; }
+    .cell.x { color: var(--green); }
+    .cell.o { color: var(--coral); }
+    .cell.winner { border-color: var(--yellow); background: #fff6d8; }
+
+    .footer {
+      display: flex;
+      justify-content: center;
+      margin-top: 21px;
+    }
+
+    .reset {
+      min-height: 42px;
+      padding: 0 17px;
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      background: transparent;
+      color: var(--ink);
+      font: inherit;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background-color 140ms ease, border-color 140ms ease;
+    }
+
+    .reset:hover { border-color: var(--green); background: var(--green-light); }
+
+    @keyframes arrive {
+      from { opacity: 0; transform: translateY(9px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="eyebrow">A little friendly rivalry</p>
+    <h1>Tic-Tac-Toe</h1>
+    <p class="intro">Three in a row takes the round.</p>
+
+    <div class="scoreboard" aria-label="Round score">
+      <div class="player"><span class="mark x" aria-hidden="true">X</span><span>Player X <strong id="score-x">0</strong></span></div>
+      <span class="score-divider" aria-hidden="true">·</span>
+      <div class="player"><span>Player O <strong id="score-o">0</strong></span><span class="mark o" aria-hidden="true">O</span></div>
+    </div>
+
+    <p class="status" id="status" aria-live="polite">Player X's turn</p>
+    <div class="board" id="board" role="group" aria-label="Tic-tac-toe board">
+      <button class="cell" type="button" data-cell="0" aria-label="Top left, empty"></button>
+      <button class="cell" type="button" data-cell="1" aria-label="Top middle, empty"></button>
+      <button class="cell" type="button" data-cell="2" aria-label="Top right, empty"></button>
+      <button class="cell" type="button" data-cell="3" aria-label="Middle left, empty"></button>
+      <button class="cell" type="button" data-cell="4" aria-label="Center, empty"></button>
+      <button class="cell" type="button" data-cell="5" aria-label="Middle right, empty"></button>
+      <button class="cell" type="button" data-cell="6" aria-label="Bottom left, empty"></button>
+      <button class="cell" type="button" data-cell="7" aria-label="Bottom middle, empty"></button>
+      <button class="cell" type="button" data-cell="8" aria-label="Bottom right, empty"></button>
+    </div>
+    <div class="footer">
+      <button class="reset" id="reset" type="button">New round</button>
+    </div>
+  </main>
+  <script src="test.js"></script>
+</body>
+</html>
